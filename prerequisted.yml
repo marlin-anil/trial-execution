@@ -1,0 +1,40 @@
+---
+- name: Prerequisted Installation AAP HA
+  hosts: all
+  become: yes
+  gather_facts: true
+  tasks:
+
+    - name: Add ansible to group wheel
+      ansible.builtin.user:
+        user: ansible
+        groups: wheel
+        append: yes
+
+    - name: Privillage access for user ansible passwordless
+      lineinfile:
+        path: /etc/sudoers
+        regexp: '^%wheel'
+        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+
+    - name: Subscription register RHEL
+      community.general.redhat_subscription:
+        state: present
+        username: demo_user_rhel
+        password: P@ssw0rdDEMO
+        auto_attach: true
+      register: rhsm_result
+      retries: 3
+      delay: 10
+      until: rhsm_result is succeeded
+
+    - name: Install package needed
+      ansible.builtin.dnf:
+        name:
+          - python3
+          - ansible-core
+          - git
+          - rsync
+          - tmux
+        state: present
