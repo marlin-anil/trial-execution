@@ -1,0 +1,13 @@
+---
+- name: Prerequisted Installation AAP HA
+  hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Add port for connection database
+      firewalld:
+        zone: public
+        port: 5555/tcp
+        state: enabled
+        permanent: true
+        immediate: true
