@@ -1,0 +1,21 @@
+---
+- name: Install and Configure Redis
+  hosts: redis
+  become: yes  # Menjalankan tugas dengan hak akses root (sudo)
+
+  tasks:
+    - name: Update dnf package cache
+      ansible.builtin.dnf:
+        update_cache: yes
+      changed_when: false # Tidak melaporkan 'changed' hanya untuk update cache
+
+    - name: Install Redis server
+      ansible.builtin.dnf:
+        name: redis-server
+        state: present # Memastikan paket terinstal
+
+    - name: Ensure Redis service is running and enabled on boot
+      ansible.builtin.service:
+        name: redis-server
+        state: started   # Memastikan layanan sedang berjalan
+        enabled: yes     # Memastikan layanan aktif saat boot
